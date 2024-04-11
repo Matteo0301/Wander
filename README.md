@@ -1,2 +1,3 @@
-# Wander
-AI travel assistant
+# wander
+
+A new Flutter project.
