@@ -32,13 +32,13 @@ class WanderMap extends StatelessWidget {
                 icon: Icon(
                   Icons.person_pin_circle,
                   color: Colors.blue,
-                  size: MyTheme.iconSize,
+                  size: MyTheme.locationIconSize,
                 ),
               ),
               directionArrowMarker: const MarkerIcon(
                 icon: Icon(
                   Icons.double_arrow,
-                  size: MyTheme.iconSize,
+                  size: MyTheme.locationIconSize,
                 ),
               ),
             ),
