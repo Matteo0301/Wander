@@ -74,6 +74,7 @@ class MainApp extends StatelessWidget {
                                 child: FloatingActionButton(
                                   onPressed: () {
                                     WanderMap.controller.currentLocation();
+                                    WanderMap.controller.enableTracking();
                                   },
                                   backgroundColor: Colors.blueGrey.shade300,
                                   shape: const CircleBorder(),
@@ -83,7 +84,7 @@ class MainApp extends StatelessWidget {
                                 padding: MyTheme.padding,
                                 child: FloatingActionButton(
                                   onPressed: () {
-                                    WanderMap.controller.currentLocation();
+                                    // TODO: Open voice command
                                   },
                                   backgroundColor: Colors.blueGrey.shade300,
                                   shape: const CircleBorder(),
