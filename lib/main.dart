@@ -46,10 +46,10 @@ class Home extends StatelessWidget {
                             padding: MyTheme.padding,
                             child: IconButton(
                               onPressed: () {
-                                Navigator.push(context,
-                                    MaterialPageRoute(builder: (context) {
-                                  return const Menu();
-                                }));
+                                Navigator.push(
+                                    context,
+                                    MaterialPageRoute(
+                                        builder: (context) => const Menu()));
                               },
                               style: ButtonStyle(
                                 backgroundColor: MaterialStateProperty.all(

@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:wander/assistant.dart';
 import 'package:wander/main.dart';
 import 'package:wander/theme.dart';
 
@@ -28,9 +29,7 @@ class Menu extends StatelessWidget {
                     child: IconButton(
                       onPressed: () {
                         Navigator.push(context,
-                            MaterialPageRoute(builder: (context) {
-                          return Home();
-                        }));
+                            MaterialPageRoute(builder: (context) => Home()));
                       },
                       style: ButtonStyle(
                         backgroundColor:
@@ -46,10 +45,10 @@ class Menu extends StatelessWidget {
                     padding: const EdgeInsets.all(30),
                     child: IconButton(
                       onPressed: () {
-                        Navigator.push(context,
-                            MaterialPageRoute(builder: (context) {
-                          return Home();
-                        }));
+                        Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                                builder: (context) => const Assistant()));
                       },
                       style: ButtonStyle(
                         backgroundColor: MaterialStateProperty.all(
