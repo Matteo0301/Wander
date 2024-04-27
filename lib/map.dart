@@ -1,54 +1,157 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_osm_plugin/flutter_osm_plugin.dart';
+import 'package:flutter_map/flutter_map.dart';
+import 'package:flutter_map_location_marker/flutter_map_location_marker.dart';
+import 'package:geolocator/geolocator.dart';
+import 'package:latlong2/latlong.dart';
+import 'package:wander/menu.dart';
 import 'package:wander/theme.dart';
 
 class WanderMap extends StatelessWidget {
   const WanderMap({super.key});
-  static final MapController controller = MapController(
-    initMapWithUserPosition:
-        const UserTrackingOption(enableTracking: true, unFollowUser: true),
-  );
   final BorderRadius borderRadius = MyTheme.windowBorderRadius;
+
+  static const double zoomUpdate = 0.5;
 
   @override
   Widget build(BuildContext context) {
+    final CurrentLocationLayer locLayer =
+        CurrentLocationLayer(alignPositionOnUpdate: AlignOnUpdate.once);
     return ClipRRect(
-      borderRadius: borderRadius,
-      child: OSMFlutter(
-          controller: controller,
-          osmOption: OSMOption(
-            userTrackingOption: const UserTrackingOption(
-              enableTracking: true,
-              unFollowUser: true,
+        borderRadius: borderRadius,
+        child: FlutterMap(
+          options: const MapOptions(
+            initialCenter: LatLng(51.509364, -0.128928),
+            initialZoom: 9.2,
+          ),
+          children: [
+            TileLayer(
+              urlTemplate: 'https://tile.openstreetmap.org/{z}/{x}/{y}.png',
             ),
-            zoomOption: const ZoomOption(
-              initZoom: 18,
-              minZoomLevel: 3,
-              maxZoomLevel: 19,
-              stepZoom: 1.0,
-            ),
-            userLocationMarker: UserLocationMaker(
-              personMarker: const MarkerIcon(
-                icon: Icon(
-                  Icons.person_pin_circle,
-                  color: Colors.blue,
-                  size: MyTheme.locationIconSize,
-                ),
+            Align(
+              alignment: Alignment.bottomRight,
+              child: Column(
+                verticalDirection: VerticalDirection.up,
+                children: [
+                  Padding(
+                      padding: MyTheme.padding,
+                      child: IconButton(
+                        onPressed: () {
+                          Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                  builder: (context) => const Menu()));
+                        },
+                        style: ButtonStyle(
+                          backgroundColor:
+                              MaterialStateProperty.all(Colors.blue.shade200),
+                          fixedSize: MaterialStateProperty.all(const Size(
+                              MyTheme.buttonSize, MyTheme.buttonSize)),
+                          iconSize:
+                              MaterialStateProperty.all(MyTheme.buttonIconSize),
+                        ),
+                        icon: const Icon(Icons.menu),
+                      )),
+                  const ZoomOutButton(),
+                  const ZoomInButton(),
+                  CenterButton(locLayer: locLayer),
+                  Padding(
+                      padding: MyTheme.padding,
+                      child: IconButton(
+                        onPressed: () {
+                          // TODO: Open voice command
+                        },
+                        style: ButtonStyle(
+                          backgroundColor: MaterialStateProperty.all(
+                              Colors.blueGrey.shade300),
+                          fixedSize: MaterialStateProperty.all(const Size(
+                              MyTheme.buttonSize, MyTheme.buttonSize)),
+                          iconSize:
+                              MaterialStateProperty.all(MyTheme.buttonIconSize),
+                        ),
+                        icon: const Icon(Icons.mic),
+                      )),
+                ],
               ),
-              directionArrowMarker: const MarkerIcon(
-                icon: Icon(
-                  Icons.double_arrow,
-                  size: MyTheme.locationIconSize,
-                ),
-              ),
             ),
-            roadConfiguration: const RoadOption(
-              roadColor: Colors.yellowAccent,
-            ),
-            showZoomController: true,
-            showDefaultInfoWindow: true,
-            enableRotationByGesture: true,
-          )),
-    );
+            locLayer,
+          ],
+        ));
+  }
+}
+
+class ZoomInButton extends StatelessWidget {
+  const ZoomInButton({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return Padding(
+        padding: MyTheme.padding,
+        child: IconButton(
+          onPressed: () {
+            MapController.of(context).move(
+                MapController.of(context).camera.center,
+                MapController.of(context).camera.zoom + WanderMap.zoomUpdate);
+          },
+          style: ButtonStyle(
+            backgroundColor: MaterialStateProperty.all(Colors.orange.shade200),
+            fixedSize: MaterialStateProperty.all(
+                const Size(MyTheme.buttonSize, MyTheme.buttonSize)),
+            iconSize: MaterialStateProperty.all(MyTheme.buttonIconSize),
+          ),
+          icon: const Icon(Icons.add),
+        ));
+  }
+}
+
+class ZoomOutButton extends StatelessWidget {
+  const ZoomOutButton({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return Padding(
+        padding: MyTheme.padding,
+        child: IconButton(
+          onPressed: () {
+            MapController.of(context).move(
+                MapController.of(context).camera.center,
+                MapController.of(context).camera.zoom - WanderMap.zoomUpdate);
+          },
+          style: ButtonStyle(
+            backgroundColor: MaterialStateProperty.all(Colors.orange.shade200),
+            fixedSize: MaterialStateProperty.all(
+                const Size(MyTheme.buttonSize, MyTheme.buttonSize)),
+            iconSize: MaterialStateProperty.all(MyTheme.buttonIconSize),
+          ),
+          icon: const Icon(Icons.remove),
+        ));
+  }
+}
+
+class CenterButton extends StatelessWidget {
+  const CenterButton({super.key, required this.locLayer});
+  final CurrentLocationLayer locLayer;
+
+  @override
+  Widget build(BuildContext context) {
+    return Padding(
+        padding: MyTheme.padding,
+        child: IconButton(
+          onPressed: () async {
+            final Position pos = (await Geolocator.getCurrentPosition());
+            if (context.mounted) {
+              MapController.of(context).move(
+                  LatLng(pos.latitude, pos.longitude),
+                  MapController.of(context).camera.zoom);
+            }
+          },
+          style: ButtonStyle(
+            backgroundColor:
+                MaterialStateProperty.all(Colors.blueGrey.shade300),
+            fixedSize: MaterialStateProperty.all(
+                const Size(MyTheme.buttonSize, MyTheme.buttonSize)),
+            iconSize: MaterialStateProperty.all(MyTheme.buttonIconSize),
+          ),
+          icon: const Icon(Icons.gps_fixed),
+        ));
   }
 }

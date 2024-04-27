@@ -1,15 +1,21 @@
 name: wander
 description: "A new Flutter project."
-publish_to: 'none'
+publish_to: "none"
 version: 0.1.0
 
 environment:
-  sdk: '>=3.3.3 <4.0.0'
+  sdk: ">=3.3.3 <4.0.0"
 
 dependencies:
+  dart_openai: ^5.1.0
   flutter:
     sdk: flutter
-  flutter_osm_plugin: ^1.0.2
+  flutter_map: ^6.1.0
+  flutter_map_location_marker: ^8.0.8
+  geolocator: ^11.0.0
+  latlong2: ^0.9.1
+  path_provider: ^2.1.3
+  record: ^5.0.5
 
 dev_dependencies:
   flutter_test:

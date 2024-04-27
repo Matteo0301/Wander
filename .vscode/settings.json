@@ -1,6 +1,10 @@
 {
     "cSpell.words": [
+        "Geolocator",
+        "latlong",
         "lerp",
+        "openai",
         "Prelayout"
-    ]
+    ],
+    "cmake.configureOnOpen": false
 }

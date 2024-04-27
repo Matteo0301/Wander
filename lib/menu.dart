@@ -17,7 +17,7 @@ class Menu extends StatelessWidget {
           child: DecoratedBox(
               decoration: BoxDecoration(
                 borderRadius: MyTheme.windowBorderRadius,
-                color: Colors.indigo.shade200,
+                color: Colors.blue.shade200,
                 boxShadow: const [
                   MyTheme.shadow,
                 ],
@@ -28,8 +28,10 @@ class Menu extends StatelessWidget {
                     padding: const EdgeInsets.all(30),
                     child: IconButton(
                       onPressed: () {
-                        Navigator.push(context,
-                            MaterialPageRoute(builder: (context) => Home()));
+                        Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                                builder: (context) => const Home()));
                       },
                       style: ButtonStyle(
                         backgroundColor:
@@ -48,7 +50,7 @@ class Menu extends StatelessWidget {
                         Navigator.push(
                             context,
                             MaterialPageRoute(
-                                builder: (context) => const Assistant()));
+                                builder: (context) => Assistant()));
                       },
                       style: ButtonStyle(
                         backgroundColor: MaterialStateProperty.all(
