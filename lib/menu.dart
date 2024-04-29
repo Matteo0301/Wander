@@ -50,7 +50,7 @@ class Menu extends StatelessWidget {
                         Navigator.push(
                             context,
                             MaterialPageRoute(
-                                builder: (context) => Assistant()));
+                                builder: (context) => const Assistant()));
                       },
                       style: ButtonStyle(
                         backgroundColor: MaterialStateProperty.all(
