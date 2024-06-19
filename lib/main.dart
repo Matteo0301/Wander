@@ -29,21 +29,7 @@ class Home extends StatelessWidget {
   Widget build(BuildContext context) {
     return const Scaffold(
       backgroundColor: Colors.blueGrey,
-      body: Center(
-        child: SizedBox(
-          width: MyTheme.windowSize,
-          height: MyTheme.windowSize,
-          child: DecoratedBox(
-            decoration: BoxDecoration(
-              borderRadius: MyTheme.windowBorderRadius,
-              boxShadow: [
-                MyTheme.shadow,
-              ],
-            ),
-            child: WanderMap(),
-          ),
-        ),
-      ),
+      body: WanderMap(),
     );
   }
 }

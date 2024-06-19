@@ -5,7 +5,7 @@ import 'package:dart_openai/dart_openai.dart';
 import 'package:flutter/material.dart';
 import 'package:wander/assistant_result.dart';
 import 'package:wander/audio_button.dart';
-import 'package:wander/menu.dart';
+import 'package:wander/map.dart';
 import 'package:wander/theme.dart';
 
 class Assistant extends StatelessWidget {
@@ -52,7 +52,7 @@ class Assistant extends StatelessWidget {
                                   Navigator.push(
                                       context,
                                       MaterialPageRoute(
-                                          builder: (context) => const Menu()));
+                                          builder: (context) => const WanderMap()));
                                 },
                                 style: ButtonStyle(
                                   backgroundColor: MaterialStateProperty.all(

@@ -3,7 +3,7 @@ import 'package:flutter_map/flutter_map.dart';
 import 'package:flutter_map_location_marker/flutter_map_location_marker.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:latlong2/latlong.dart';
-import 'package:wander/menu.dart';
+import 'package:wander/assistant.dart';
 import 'package:wander/theme.dart';
 
 class WanderMap extends StatelessWidget {
@@ -16,66 +16,48 @@ class WanderMap extends StatelessWidget {
   Widget build(BuildContext context) {
     final CurrentLocationLayer locLayer =
         CurrentLocationLayer(alignPositionOnUpdate: AlignOnUpdate.once);
-    return ClipRRect(
-        borderRadius: borderRadius,
-        child: FlutterMap(
-          options: const MapOptions(
-            initialCenter: LatLng(51.509364, -0.128928),
-            initialZoom: 9.2,
+    return FlutterMap(
+      options: const MapOptions(
+        initialCenter: LatLng(51.509364, -0.128928),
+        initialZoom: 9.2,
+      ),
+      children: [
+        TileLayer(
+          urlTemplate: 'https://tile.openstreetmap.org/{z}/{x}/{y}.png',
+        ),
+        Align(
+          alignment: Alignment.bottomRight,
+          child: Column(
+            verticalDirection: VerticalDirection.up,
+            children: [
+              Padding(
+                  padding: MyTheme.padding,
+                  child: IconButton(
+                    onPressed: () {
+                      Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                              builder: (context) => const Assistant()));
+                    },
+                    style: ButtonStyle(
+                      backgroundColor:
+                          MaterialStateProperty.all(Colors.blue.shade200),
+                      fixedSize: MaterialStateProperty.all(
+                          const Size(MyTheme.buttonSize, MyTheme.buttonSize)),
+                      iconSize:
+                          MaterialStateProperty.all(MyTheme.buttonIconSize),
+                    ),
+                    icon: const Icon(Icons.help_outline),
+                  )),
+              const ZoomOutButton(),
+              const ZoomInButton(),
+              CenterButton(locLayer: locLayer),
+            ],
           ),
-          children: [
-            TileLayer(
-              urlTemplate: 'https://tile.openstreetmap.org/{z}/{x}/{y}.png',
-            ),
-            Align(
-              alignment: Alignment.bottomRight,
-              child: Column(
-                verticalDirection: VerticalDirection.up,
-                children: [
-                  Padding(
-                      padding: MyTheme.padding,
-                      child: IconButton(
-                        onPressed: () {
-                          Navigator.push(
-                              context,
-                              MaterialPageRoute(
-                                  builder: (context) => const Menu()));
-                        },
-                        style: ButtonStyle(
-                          backgroundColor:
-                              MaterialStateProperty.all(Colors.blue.shade200),
-                          fixedSize: MaterialStateProperty.all(const Size(
-                              MyTheme.buttonSize, MyTheme.buttonSize)),
-                          iconSize:
-                              MaterialStateProperty.all(MyTheme.buttonIconSize),
-                        ),
-                        icon: const Icon(Icons.menu),
-                      )),
-                  const ZoomOutButton(),
-                  const ZoomInButton(),
-                  CenterButton(locLayer: locLayer),
-                  Padding(
-                      padding: MyTheme.padding,
-                      child: IconButton(
-                        onPressed: () {
-                          // TODO: Open voice command
-                        },
-                        style: ButtonStyle(
-                          backgroundColor: MaterialStateProperty.all(
-                              Colors.blueGrey.shade300),
-                          fixedSize: MaterialStateProperty.all(const Size(
-                              MyTheme.buttonSize, MyTheme.buttonSize)),
-                          iconSize:
-                              MaterialStateProperty.all(MyTheme.buttonIconSize),
-                        ),
-                        icon: const Icon(Icons.mic),
-                      )),
-                ],
-              ),
-            ),
-            locLayer,
-          ],
-        ));
+        ),
+        locLayer,
+      ],
+    );
   }
 }
 
