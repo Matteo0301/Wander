@@ -32,7 +32,7 @@ class AudioButtonState extends State<AudioButton> {
   Future<bool> stopRecording() async {
     final path = await record.stop();
     debugPrint(path);
-    recording = true;
+    recording = false;
     if (path != null) {
       widget.afterStopped(path);
       return true;
@@ -61,12 +61,6 @@ class AudioButtonState extends State<AudioButton> {
           }
         }
       },
-      style: ButtonStyle(
-        backgroundColor: MaterialStateProperty.all(Colors.blueGrey.shade400),
-        fixedSize: MaterialStateProperty.all(const Size(200, 200)),
-        iconSize: MaterialStateProperty.all(100),
-        shadowColor: MaterialStateProperty.all(Colors.black),
-      ),
       icon: const Icon(Icons.mic),
     );
   }

@@ -3,7 +3,7 @@ import 'package:flutter_map/flutter_map.dart';
 import 'package:flutter_map_location_marker/flutter_map_location_marker.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:latlong2/latlong.dart';
-import 'package:wander/assistant.dart';
+import 'package:wander/chat.dart';
 import 'package:wander/theme.dart';
 
 class WanderMap extends StatelessWidget {
@@ -19,7 +19,7 @@ class WanderMap extends StatelessWidget {
     return FlutterMap(
       options: const MapOptions(
         initialCenter: LatLng(51.509364, -0.128928),
-        initialZoom: 9.2,
+        initialZoom: 16,
       ),
       children: [
         TileLayer(
@@ -28,29 +28,31 @@ class WanderMap extends StatelessWidget {
         Align(
           alignment: Alignment.bottomRight,
           child: Column(
-            verticalDirection: VerticalDirection.up,
+            verticalDirection: VerticalDirection.down,
             children: [
               Padding(
-                  padding: MyTheme.padding,
-                  child: IconButton(
-                    onPressed: () {
-                      Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                              builder: (context) => const Assistant()));
-                    },
-                    style: ButtonStyle(
-                      backgroundColor:
-                          MaterialStateProperty.all(Colors.blue.shade200),
-                      fixedSize: MaterialStateProperty.all(
-                          const Size(MyTheme.buttonSize, MyTheme.buttonSize)),
-                      iconSize:
-                          MaterialStateProperty.all(MyTheme.buttonIconSize),
-                    ),
-                    icon: const Icon(Icons.help_outline),
-                  )),
-              const ZoomOutButton(),
+                padding: const EdgeInsets.only(top: 50.0),
+                child: Padding(
+                    padding: MyTheme.padding,
+                    child: IconButton(
+                      onPressed: () {
+                        Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                                builder: (context) => const ChatPage()));
+                      },
+                      style: ButtonStyle(
+                        backgroundColor:
+                            MaterialStateProperty.all(Colors.blue.shade200),
+                        fixedSize: MaterialStateProperty.all(
+                            const Size(MyTheme.buttonSize, MyTheme.buttonSize)),
+                        iconSize:
+                            MaterialStateProperty.all(MyTheme.buttonIconSize),
+                      ),
+                      icon: const Icon(Icons.help_outline),
+                    )),),
               const ZoomInButton(),
+              const ZoomOutButton(),
               CenterButton(locLayer: locLayer),
             ],
           ),
