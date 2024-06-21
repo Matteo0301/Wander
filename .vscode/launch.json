@@ -7,7 +7,10 @@
         {
             "name": "Wander",
             "request": "launch",
-            "type": "dart"
+            "type": "dart",
+            "args": [
+                "--web-browser-flag \"--disable-web-security\"",
+            ],
         },
         {
             "name": "Wander (profile mode)",

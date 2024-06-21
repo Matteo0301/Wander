@@ -2,7 +2,6 @@ import 'package:dart_openai/dart_openai.dart';
 import 'package:flutter/material.dart';
 import 'package:wander/map.dart';
 import 'package:wander/secrets.dart';
-import 'package:wander/theme.dart';
 
 void main() {
   OpenAI.apiKey = chatGPTKey;
@@ -27,7 +26,7 @@ class Home extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return const Scaffold(
+    return Scaffold(
       backgroundColor: Colors.blueGrey,
       body: WanderMap(),
     );
