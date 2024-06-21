@@ -26,8 +26,8 @@ class ChatPage extends StatefulWidget {
 }
 
 class _ChatPageState extends State<ChatPage> {
-  List<types.Message> _messages = [];
-  List<String> messageTexts = [];
+  static List<types.Message> _messages = [];
+  static List<String> messageTexts = [];
   final _user = const types.User(
     id: '82091008-a484-4a89-ae75-a22bf8d6f3ac',
   );
@@ -105,7 +105,8 @@ class _ChatPageState extends State<ChatPage> {
   @override
   void initState() {
     super.initState();
-    _loadMessages();
+    //TODO: add loading from server
+    //_loadMessages();
   }
 
   void _addMessage(types.Message message, String text) {
