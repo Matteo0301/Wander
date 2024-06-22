@@ -3,8 +3,9 @@ import 'package:path_provider/path_provider.dart';
 import 'package:record/record.dart';
 
 class AudioButton extends StatefulWidget {
-  const AudioButton({super.key, required this.afterStopped});
+  const AudioButton({super.key, required this.afterStopped, this.color});
   final void Function(String path) afterStopped;
+  final MaterialColor? color;
 
   @override
   State<StatefulWidget> createState() => AudioButtonState();
@@ -61,7 +62,7 @@ class AudioButtonState extends State<AudioButton> {
           }
         }
       },
-      icon: const Icon(Icons.mic),
+      icon: Icon(Icons.mic, color: widget.color,),
     );
   }
 }

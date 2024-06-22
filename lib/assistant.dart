@@ -75,12 +75,16 @@ class Assistant extends StatelessWidget {
 
 class ResponseText {
   final String response;
-  ResponseText({required this.response});
+  final List<String>? itinerary;
+  ResponseText( {required this.itinerary, required this.response});
 
   factory ResponseText.fromJson(Map<String, dynamic> json) {
     final String response = (json.containsKey("response"))
         ? json["response"]
         : "Error while connecting to the server";
-    return ResponseText(response: response);
+    final List<String>? itinerary = (json.containsKey("itinerary"))
+        ? List<String>.from(json["itinerary"] as List)
+        : null;
+    return ResponseText(response: response, itinerary: itinerary);
   }
 }

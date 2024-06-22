@@ -1,11 +1,13 @@
 import 'dart:convert';
 import 'dart:io';
 
+import 'package:dart_openai/dart_openai.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_map/flutter_map.dart';
 import 'package:flutter_map_location_marker/flutter_map_location_marker.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:latlong2/latlong.dart';
+import 'package:wander/assistant.dart';
 import 'package:wander/chat.dart';
 import 'package:wander/theme.dart';
 import 'package:http/http.dart' as http;
@@ -25,14 +27,14 @@ class Path {
   Path({required this.markers, required this.segments});
 }
 
-class WanderMap extends StatelessWidget {
+class WanderMap extends StatefulWidget {
   const WanderMap({super.key});
   final BorderRadius borderRadius = MyTheme.windowBorderRadius;
 
   static const double zoomUpdate = 0.5;
-  static List<String> places = ["La Frizza", "Pegognaga", "Mantova", "Verona"];
+  
 
-  Future<LatLng> address2Coordinates(String address) async {
+  static Future<LatLng> address2Coordinates(String address) async {
     final String url =
         'https://maps.googleapis.com/maps/api/geocode/json?address=${Uri.encodeFull(address)}&key=$mapsAPI';
     try {
@@ -46,22 +48,22 @@ class WanderMap extends StatelessWidget {
           debugPrint(LatLng(lat, lng).toString());
           return LatLng(lat, lng);
         } else {
-          return Future.error('Indirizzo non trovato');
+          return Future.error('Unknown address');
         }
       } else {
-        return Future.error('Errore durante l\'operazione');
+        return Future.error('Error during the operation');
       }
     } catch (e) {
-      return Future.error('Impossibile connettersi');
+      return Future.error('Server unreachable');
     }
   }
 
-  Future<List<Segment>> getPath(List<LatLng> coords) async {
+  static Future<List<Segment>> getPath(List<LatLng> coords) async {
     if(coords.length <= 1){
       return [];
     }
     var c = coords.map((e) => "${e.latitude},${e.longitude}").toList().sublist(1).toList().reversed.toList().sublist(1);
-    String waypoints = (c.length > 0)?"&waypoints=optimize:true|${c.join('|')}":"";
+    String waypoints = (c.isNotEmpty)?"&waypoints=optimize:true|${c.join('|')}":"";
     final String url =
         'https://maps.googleapis.com/maps/api/directions/json?origin=${coords[0].latitude},${coords[0].longitude}&destination=${coords[coords.length-1].latitude},${coords[coords.length-1].longitude}$waypoints&key=$mapsAPI';
     try {
@@ -80,16 +82,16 @@ class WanderMap extends StatelessWidget {
         }
         return path;
       } else {
-        return Future.error('Errore durante l\'operazione');
+        return Future.error('Error during the operation');
       }
     } catch (e) {
       debugPrint(e.toString());
-      return Future.error('Impossibile connettersi');
+      return Future.error('Server unreachable');
     }
   }
 
 
-  Future<Path> createItinerary(List<String> places) async {
+  static Future<Path> createItinerary(List<String> places) async {
     List<LatLng> coords = [];
     for(int i=0;i<places.length;i++){
       coords.add(await address2Coordinates(places[i]));
@@ -99,23 +101,39 @@ class WanderMap extends StatelessWidget {
   }
 
   @override
+  State<StatefulWidget> createState() => MapState();
+}
+
+class MapState extends State<WanderMap>{
+  static List<String> places = [];
+  @override
   Widget build(BuildContext context) {
-    
     return FutureBuilder(
-      future: createItinerary(places),
+      future: WanderMap.createItinerary(places),
       builder: (context, snapshot) {
-        if(!snapshot.hasData && !snapshot.hasError) {
+        if (!snapshot.hasData && !snapshot.hasError) {
           return const CircularProgressIndicator();
         }
         final CurrentLocationLayer locLayer =
             CurrentLocationLayer(alignPositionOnUpdate: AlignOnUpdate.once);
         List<Marker> markers = [];
         List<LatLng> line = [];
-        if(!snapshot.hasError && snapshot.data!=null){
-          for (var element in snapshot.data!.markers) { markers.add(Marker(point: element,height: 50,width: 50, child: const Icon(Icons.place, color: Colors.red,)));}
-          if(snapshot.data!.segments.length>0){
+        if (!snapshot.hasError && snapshot.data != null) {
+          for (var element in snapshot.data!.markers) {
+            markers.add(Marker(
+                point: element,
+                height: 50,
+                width: 50,
+                child: const Icon(
+                  Icons.place,
+                  color: Colors.red,
+                )));
+          }
+          if (snapshot.data!.segments.isNotEmpty) {
             line.add(snapshot.data!.segments[0].start);
-            snapshot.data!.segments.forEach((element) {line.add(element.end);});
+            for (var element in snapshot.data!.segments) {
+              line.add(element.end);
+            }
           }
         }
         return FlutterMap(
@@ -147,26 +165,59 @@ class WanderMap extends StatelessWidget {
                           style: ButtonStyle(
                             backgroundColor:
                                 MaterialStateProperty.all(Colors.blue.shade200),
-                            fixedSize: MaterialStateProperty.all(
-                                const Size(MyTheme.buttonSize, MyTheme.buttonSize)),
-                            iconSize:
-                                MaterialStateProperty.all(MyTheme.buttonIconSize),
+                            fixedSize: MaterialStateProperty.all(const Size(
+                                MyTheme.buttonSize, MyTheme.buttonSize)),
+                            iconSize: MaterialStateProperty.all(
+                                MyTheme.buttonIconSize),
                           ),
                           icon: const Icon(Icons.help_outline),
-                        )),),
+                        )),
+                  ),
                   const ZoomInButton(),
                   const ZoomOutButton(),
                   CenterButton(locLayer: locLayer),
+                  /* AudioButton(
+                      color: Colors.purple,
+                      afterStopped: (path) async {
+                        String transcription = await widget.audioTranscribe(path);
+                        var p =
+                            jsonDecode(await widget.getResponse(transcription, []));
+                        debugPrint(p);
+                        setState(() {
+                          places.add(p["places"]);
+                        });
+                      }) */
+                  Padding(
+                      padding: MyTheme.padding,
+                      child: IconButton(
+                        onPressed: () {
+                          setState(() {
+                            
+                          });
+                        },
+                        style: ButtonStyle(
+                          backgroundColor:
+                              MaterialStateProperty.all(Colors.blue.shade200),
+                          fixedSize: MaterialStateProperty.all(const Size(
+                              MyTheme.buttonSize, MyTheme.buttonSize)),
+                          iconSize:
+                              MaterialStateProperty.all(MyTheme.buttonIconSize),
+                        ),
+                        icon: const Icon(Icons.replay),
+                      ))
                 ],
               ),
             ),
             locLayer,
             MarkerLayer(markers: markers),
-            PolylineLayer(polylines: [Polyline(points: line, color: Colors.orange)]),
+            PolylineLayer(
+                polylines: [Polyline(points: line, color: Colors.orange, borderStrokeWidth: 3.0, borderColor: Colors.orange)]),
           ],
         );
-      },);
+      },
+    );
   }
+  
 }
 
 class ZoomInButton extends StatelessWidget {

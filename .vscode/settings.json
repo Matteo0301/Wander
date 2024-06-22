@@ -4,7 +4,10 @@
         "latlong",
         "lerp",
         "openai",
-        "Prelayout"
+        "Polyline",
+        "polylines",
+        "Prelayout",
+        "sublist"
     ],
     "cmake.configureOnOpen": false
 }

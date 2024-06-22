@@ -4,18 +4,12 @@ import 'dart:io';
 //import 'package:file_picker/file_picker.dart';
 import 'package:dart_openai/dart_openai.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart' show rootBundle;
 import 'package:flutter_chat_types/flutter_chat_types.dart' as types;
 import 'package:flutter_chat_ui/flutter_chat_ui.dart';
-import 'package:http/http.dart' as http;
-/* import 'package:image_picker/image_picker.dart';
-import 'package:intl/date_symbol_data_local.dart';
-import 'package:mime/mime.dart';
-import 'package:open_filex/open_filex.dart'; */
-import 'package:path_provider/path_provider.dart';
 import 'package:uuid/uuid.dart';
 import 'package:wander/assistant.dart';
 import 'package:wander/audio_button.dart';
+import 'package:wander/map.dart';
 
 
 class ChatPage extends StatefulWidget {
@@ -34,7 +28,7 @@ class _ChatPageState extends State<ChatPage> {
 
   final chat = const types.User(
     id: '82091008-a484-4a89-ae75-a22bf8d6f3ad',
-    imageUrl: null,
+    //imageUrl: null,
     firstName: "Wander",
   );
 
@@ -43,8 +37,9 @@ class _ChatPageState extends State<ChatPage> {
     final systemMessage = OpenAIChatCompletionChoiceMessageModel(
       content: [
         OpenAIChatCompletionChoiceMessageContentItemModel.text(
-          "Answer every prompt by the user as if you were a travel guide, return the answer as JSON and remember you must put the result into the 'response' field in a human readable way. All the messages that will follow are the previous conversation between you and the user.",
+          "Answer every prompt by the user as if you were a travel guide, return the answer as JSON and remember you must put the result into the 'response' field in a human readable way. You will find a JSON containing the current itinerary of the user in the next message, if the user asks to modify it by adding or removing some places return the new one in the 'itinerary' field, otherwise return the old one. The 'itinerary' field should be a list of strings (places) that can be understood from Google Maps, and that are sorted in the way that you think is the best. All the messages that will follow are the previous conversation between you and the user. Remember that you must ALWAYS put an answer into the 'response' field.",
         ),
+        OpenAIChatCompletionChoiceMessageContentItemModel.text(jsonEncode(MapState.places)),
       ] + previousMessages.map((e) => OpenAIChatCompletionChoiceMessageContentItemModel.text(e)).toList(),
       role: OpenAIChatMessageRole.assistant,
     );
@@ -84,7 +79,10 @@ class _ChatPageState extends State<ChatPage> {
         (chatCompletion.choices.first.message.content?.first.text != null)
             ? ResponseText.fromJson(jsonDecode(
                 chatCompletion.choices.first.message.content!.first.text!))
-            : ResponseText(response: "Error while connecting to the server");
+            : ResponseText(response: "Error while connecting to the server", itinerary: null);
+    if(response.itinerary != null){
+      MapState.places = response.itinerary!;
+    }
     return response.response;
   }
 
@@ -236,6 +234,14 @@ class _ChatPageState extends State<ChatPage> {
 
   @override
   Widget build(BuildContext context) => Scaffold(
+        appBar: AppBar(
+          actions: [
+             AudioButton(afterStopped: (path) async {
+          String msg = await audioTranscribe(path);
+          handleConversation(msg);
+        })
+          ],
+        ),
         body: Chat(
           messages: _messages,
           //onAttachmentPressed: _handleAttachmentPressed,
@@ -246,9 +252,6 @@ class _ChatPageState extends State<ChatPage> {
           showUserNames: true,
           user: _user,
         ),
-        floatingActionButton: Padding(padding: const EdgeInsets.only(bottom: 70),child: FloatingActionButton(onPressed: (){},child: AudioButton(afterStopped: (path) async {
-          String msg = await audioTranscribe(path);
-          handleConversation(msg);
-        }),)),
+        //floatingActionButton: Padding(padding: const EdgeInsets.only(bottom: 70),child: FloatingActionButton(onPressed: (){},child:,)),
       );
 }
