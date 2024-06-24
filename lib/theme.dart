@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 
 class MyTheme {
   static const windowBorderRadius = BorderRadius.all(Radius.circular(40));
-  static const padding = EdgeInsets.all(10);
+  static const padding = EdgeInsets.all(5);
   static const double windowSize = 400;
   static const double locationIconSize = 90;
   static const BoxShadow shadow = BoxShadow(

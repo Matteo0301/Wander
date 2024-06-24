@@ -1,18 +1,14 @@
 import 'dart:convert';
 import 'dart:io';
 
-import 'package:dart_openai/dart_openai.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_map/flutter_map.dart';
 import 'package:flutter_map_location_marker/flutter_map_location_marker.dart';
-import 'package:geolocator/geolocator.dart';
 import 'package:latlong2/latlong.dart';
-import 'package:wander/assistant.dart';
 import 'package:wander/chat.dart';
 import 'package:wander/theme.dart';
 import 'package:http/http.dart' as http;
 import 'secrets.dart';
-import 'package:flutter_map_cancellable_tile_provider/flutter_map_cancellable_tile_provider.dart';
 
 class Segment {
   final LatLng start,end;
@@ -96,7 +92,8 @@ class WanderMap extends StatefulWidget {
     for(int i=0;i<places.length;i++){
       coords.add(await address2Coordinates(places[i]));
     }
-    var path = await getPath(coords);
+    final newCoords = [LatLng(46.06719179641776, 11.149827920142652)] + coords;
+    var path = await getPath(newCoords);
     return Path(markers: coords, segments: path);
   }
 
@@ -108,6 +105,7 @@ class MapState extends State<WanderMap>{
   static List<String> places = [];
   @override
   Widget build(BuildContext context) {
+    const LatLng startpos = LatLng(46.06719179641776, 11.149827920142652);
     return FutureBuilder(
       future: WanderMap.createItinerary(places),
       builder: (context, snapshot) {
@@ -118,6 +116,12 @@ class MapState extends State<WanderMap>{
             CurrentLocationLayer(alignPositionOnUpdate: AlignOnUpdate.once);
         List<Marker> markers = [];
         List<LatLng> line = [];
+        markers.add(const Marker(point: startpos, height: 50,
+            width: 50,
+            child: Icon(
+                  Icons.place,
+                  color: Colors.blue,
+                )));
         if (!snapshot.hasError && snapshot.data != null) {
           for (var element in snapshot.data!.markers) {
             markers.add(Marker(
@@ -138,13 +142,14 @@ class MapState extends State<WanderMap>{
         }
         return FlutterMap(
           options: const MapOptions(
-            initialCenter: LatLng(51.509364, -0.128928),
-            initialZoom: 16,
+            initialCenter: startpos,
+            initialZoom: 18,
           ),
           children: [
             TileLayer(
               //tileProvider: CancellableNetworkTileProvider(),
-              urlTemplate: 'https://tile.openstreetmap.org/{z}/{x}/{y}.png',
+              //urlTemplate: 'https://tile.openstreetmap.org/{z}/{x}/{y}.png',
+              urlTemplate: 'https://{s}.tile-cyclosm.openstreetmap.fr/cyclosm/{z}/{x}/{y}.png',
             ),
             Align(
               alignment: Alignment.bottomRight,
@@ -152,7 +157,7 @@ class MapState extends State<WanderMap>{
                 verticalDirection: VerticalDirection.down,
                 children: [
                   Padding(
-                    padding: const EdgeInsets.only(top: 50.0),
+                    padding: const EdgeInsets.only(top: 0.0),
                     child: Padding(
                         padding: MyTheme.padding,
                         child: IconButton(
@@ -160,7 +165,7 @@ class MapState extends State<WanderMap>{
                             Navigator.push(
                                 context,
                                 MaterialPageRoute(
-                                    builder: (context) => const ChatPage()));
+                                    builder: (context) => const ChatPage())).then((value) => setState(() {}));
                           },
                           style: ButtonStyle(
                             backgroundColor:
@@ -208,7 +213,7 @@ class MapState extends State<WanderMap>{
                 ],
               ),
             ),
-            locLayer,
+            //locLayer,
             MarkerLayer(markers: markers),
             PolylineLayer(
                 polylines: [Polyline(points: line, color: Colors.orange, borderStrokeWidth: 3.0, borderColor: Colors.orange)]),
@@ -278,10 +283,10 @@ class CenterButton extends StatelessWidget {
         padding: MyTheme.padding,
         child: IconButton(
           onPressed: () async {
-            final Position pos = (await Geolocator.getCurrentPosition());
+            //final Position pos = (await Geolocator.getCurrentPosition());
             if (context.mounted) {
               MapController.of(context).move(
-                  LatLng(pos.latitude, pos.longitude),
+                  LatLng(46.06719179641776, 11.149827920142652),
                   MapController.of(context).camera.zoom);
             }
           },
